@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/pauchki/static/css/main.cd3ca312.css",
-    "main.js": "/pauchki/static/js/main.cfd47e62.js",
+    "main.js": "/pauchki/static/js/main.876510e9.js",
     "index.html": "/pauchki/index.html",
     "main.cd3ca312.css.map": "/pauchki/static/css/main.cd3ca312.css.map",
-    "main.cfd47e62.js.map": "/pauchki/static/js/main.cfd47e62.js.map"
+    "main.876510e9.js.map": "/pauchki/static/js/main.876510e9.js.map"
   },
   "entrypoints": [
     "static/css/main.cd3ca312.css",
-    "static/js/main.cfd47e62.js"
+    "static/js/main.876510e9.js"
   ]
 }
