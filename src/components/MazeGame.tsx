@@ -15,7 +15,59 @@ type MazeGameProps = {
 type Bomb = { x: number; y: number; countdown: number };
 type Point = { x: number; y: number };
 
-// Компонент
+// Компонент TouchControls
+
+const TouchControls: React.FC<{
+  onMove: (dx: number, dy: number, direction: string) => void;
+  onShoot: () => void;
+  onBomb: () => void;
+}> = ({ onMove, onShoot, onBomb }) => {
+  return (
+    <div className="touch-controls">
+      <style>{`
+        .touch-controls {
+          display: grid;
+          grid-template-areas:
+            ". up ."
+            "left shoot right"
+            ". down .";
+          gap: 8px;
+          justify-content: center;
+          align-items: center;
+          margin-top: 16px;
+        }
+
+        .touch-button {
+          width: 60px;
+          height: 60px;
+          font-size: 24px;
+          background: #eee;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          user-select: none;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .up    { grid-area: up; }
+        .down  { grid-area: down; }
+        .left  { grid-area: left; }
+        .right { grid-area: right; }
+        .shoot { grid-area: shoot; }
+      `}</style>
+
+      <div className="touch-button up"    onClick={() => onMove(0, -1, 'up')}>⬆️</div>
+      <div className="touch-button left"  onClick={() => onMove(-1, 0, 'left')}>⬅️</div>
+      <div className="touch-button shoot" onClick={onShoot}>🔫</div>
+      <div className="touch-button right" onClick={() => onMove(1, 0, 'right')}>➡️</div>
+      <div className="touch-button down"  onClick={() => onMove(0, 1, 'down')}>⬇️</div>
+      <div className="touch-button"       onClick={onBomb}>💣</div>
+    </div>
+  );
+};
+
+// Основной компонент MazeGame
 
 const MazeGame: React.FC<MazeGameProps> = ({
   map,
@@ -43,7 +95,6 @@ const MazeGame: React.FC<MazeGameProps> = ({
   const lastMoveTimeRef = useRef<number>(0);
   const loopRef = useRef<number | null>(null);
 
-  // Обновление ссылок
   useEffect(() => { enemiesRef.current = enemies; }, [enemies]);
   useEffect(() => { playerRef.current = player; }, [player]);
 
@@ -278,7 +329,7 @@ const MazeGame: React.FC<MazeGameProps> = ({
     </div>
   );
 
- return (
+  return (
     <div style={{ padding: 16 }}>
       <style>{`
         .grid-container {
@@ -302,7 +353,7 @@ const MazeGame: React.FC<MazeGameProps> = ({
         .wall { background: #333; }
         .exit { background: lightgreen; }
         .entry { background: lightblue; }
-
+  
         .entity {
           position: absolute;
           width: ${cellSize}px;
@@ -314,7 +365,7 @@ const MazeGame: React.FC<MazeGameProps> = ({
           justify-content: center;
           transition: transform 0.15s ease-out;
         }
-
+  
         .danger-zone {
           position: absolute;
           width: ${cellSize}px;
@@ -323,36 +374,42 @@ const MazeGame: React.FC<MazeGameProps> = ({
           z-index: 0;
           transform: translate(0, 0);
         }
-
+  
         .ghost { opacity: 1; transition: opacity 0.8s linear; }
         .hit { opacity: 1; transition: opacity 0.3s ease-out; }
         .hurt { animation: blink 0.2s steps(1) 2; }
-
+  
         .explosion {
           animation: boom 0.5s ease-out;
         }
-
+  
         @keyframes boom {
           0% { transform: scale(0.5); opacity: 0.6; }
           50% { transform: scale(1.5); opacity: 1; }
           100% { transform: scale(1); opacity: 0; }
         }
-
+  
         @keyframes blink {
           0% { opacity: 1; }
           50% { opacity: 0; }
           100% { opacity: 1; }
         }
       `}</style>
+  
       <div className="grid-container">
         <div className="grid-bg">
-          {map.map((row, y) => row.map((cell, x) => (
-            <div key={`${x},${y}`} className={`cell ${cell === '#' ? 'wall' : ''} ${cell === 'X' ? 'exit' : ''} ${cell === 'E' ? 'entry' : ''}`}>
-              {cell === 'X' ? '🚪' : ''}
-            </div>
-          )))}
+          {map.map((row, y) =>
+            row.map((cell, x) => (
+              <div
+                key={`${x},${y}`}
+                className={`cell ${cell === '#' ? 'wall' : ''} ${cell === 'X' ? 'exit' : ''} ${cell === 'E' ? 'entry' : ''}`}
+              >
+                {cell === 'X' ? '🚪' : ''}
+              </div>
+            ))
+          )}
         </div>
-
+  
         {bombZones.map((z, i) => (
           <div
             key={`danger-${i}`}
@@ -360,7 +417,7 @@ const MazeGame: React.FC<MazeGameProps> = ({
             style={{ transform: `translate(${z.x * cellSize}px, ${z.y * cellSize}px)` }}
           />
         ))}
-
+  
         {renderEntity(player.x, player.y, playerEmoji, 'player', player.hurt ? 'hurt' : '')}
         {enemies.map((e, i) => renderEntity(e.x, e.y, '🕷️', `enemy-${i}`))}
         {bullets.map((b, i) => renderEntity(b.x, b.y, bulletEmoji, `bullet-${i}`))}
@@ -369,13 +426,25 @@ const MazeGame: React.FC<MazeGameProps> = ({
         {bombs.map((b, i) => renderEntity(b.x, b.y, `💣${b.countdown}`, `bomb-${i}`))}
         {explosions.map((e, i) => renderEntity(e.x, e.y, '🔥', `exp-${i}`, 'explosion'))}
       </div>
-
+  
       <div style={{ marginTop: 16 }}>HP: {player.hp}</div>
-      {gameOver && <div style={{ color: 'red', fontSize: 20, marginTop: 8 }}>Игра закончена</div>}
+  
+      <TouchControls
+        onMove={(dx, dy, dir) => movePlayer(dx, dy, dir)}
+        onShoot={shoot}
+        onBomb={placeBomb}
+      />
+  
+      {gameOver && (
+        <div style={{ color: 'red', fontSize: 20, marginTop: 8 }}>
+          Игра закончена
+        </div>
+      )}
     </div>
   );
 };
 
 export default MazeGame;
+
 
 
