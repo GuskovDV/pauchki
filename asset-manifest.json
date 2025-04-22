@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/pauchki/static/css/main.cd3ca312.css",
+    "main.js": "/pauchki/static/js/main.cfd47e62.js",
+    "index.html": "/pauchki/index.html",
+    "main.cd3ca312.css.map": "/pauchki/static/css/main.cd3ca312.css.map",
+    "main.cfd47e62.js.map": "/pauchki/static/js/main.cfd47e62.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cd3ca312.css",
+    "static/js/main.cfd47e62.js"
+  ]
+}
